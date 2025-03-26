@@ -39,25 +39,27 @@ pub trait Sort<T: ?Sized>: Sized {
         Then { sorter_a: self, sorter_b: other, marker: PhantomData }
     }
 
-    /// Applies a mapping function to each value before sorting.
+    /// Provides a mapping function so that this [`Sort`] implementation may be used for values of a different type.
     #[inline]
-    fn map_owned<U, F>(self, f: F) -> MapOwned<T, U, Self, F>
+    fn map<U, F>(self, f: F) -> Map<U, T, Self, F>
     where
-        F: Fn(&T) -> U,
+        T: Sized,
+        U: ?Sized,
+        F: Fn(&U) -> T,
     {
-        MapOwned { function: f, sorter: self, marker: PhantomData }
+        Map { function: f, sorter: self, marker: PhantomData }
     }
 
-    /// Applies a mapping function to each value before sorting.
+    /// Provides a mapping function so that this [`Sort`] implementation may be used for values of a different type.
     ///
-    /// The mapped values are expected to be borrowed from the input value.
+    /// The returned value should reference the initial value directly.
     #[inline]
-    fn map_borrowed<U, F>(self, f: F) -> MapBorrowed<T, U, Self, F>
+    fn map_ref<U, F>(self, f: F) -> MapRef<U, T, Self, F>
     where
         U: ?Sized,
-        F: for<'a> Fn(&'a T) -> &'a U,
+        F: for<'a> Fn(&'a U) -> &'a T,
     {
-        MapBorrowed { function: f, sorter: self, marker: PhantomData }
+        MapRef { function: f, sorter: self, marker: PhantomData }
     }
 }
 
@@ -181,7 +183,7 @@ where
 
 /// Applies the inner mapping function to each value before sorting.
 #[derive(Clone, Debug)]
-pub struct MapOwned<T, U, S, F>
+pub struct Map<T, U, S, F>
 where
     T: ?Sized,
 {
@@ -190,10 +192,10 @@ where
     /// The inner sorter.
     sorter: S,
     /// Retains the type being sorted.
-    marker: PhantomData<fn(&T, &U)>,
+    marker: PhantomData<fn(&T, U)>,
 }
 
-impl<T, U, S, F> Sort<T> for MapOwned<T, U, S, F>
+impl<T, U, S, F> Sort<T> for Map<T, U, S, F>
 where
     T: ?Sized,
     S: Sort<U>,
@@ -207,9 +209,9 @@ where
 
 /// Applies the inner mapping function to each value before sorting.
 ///
-/// The mapped values are expected to be borrowed from the input value.
+/// The returned value should reference the initial value directly.
 #[derive(Clone, Debug)]
-pub struct MapBorrowed<T, U, S, F>
+pub struct MapRef<T, U, S, F>
 where
     T: ?Sized,
     U: ?Sized,
@@ -222,7 +224,7 @@ where
     marker: PhantomData<fn(&T, &U)>,
 }
 
-impl<T, U, S, F> Sort<T> for MapBorrowed<T, U, S, F>
+impl<T, U, S, F> Sort<T> for MapRef<T, U, S, F>
 where
     T: ?Sized,
     U: ?Sized,
