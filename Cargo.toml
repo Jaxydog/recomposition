@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+#
+# Copyright © 2025 Jaxydog
+#
+# This file is part of Recomposition.
+#
+# Recomposition is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# Recomposition is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along with Recomposition. If not, see
+# <https://www.gnu.org/licenses/>.
+
+[package]
+name = 'recomposition'
+description = 'A small library that adds additional chain-able iterator-like types.'
+authors = ['Jaxydog']
+categories = ['no-std', 'rust-patterns']
+keywords = ['filter', 'iterator', 'sort']
+
+version = '0.1.0'
+edition = '2024'
+license = 'LGPL-3.0-or-later'
+
+repository = 'https://github.com/Jaxydog/recomposition'
+readme = 'README.md'
+
+[features]
+default = ['std', 'filtering', 'sorting']
+std = []
+filtering = []
+sorting = []
+
+[lints]
+# Give better warnings for all Cargo manifests.
+clippy.cargo = { level = 'warn', priority = -1 }
+# Overly pedantic warnings are appreciated here.
+clippy.pedantic = { level = 'warn', priority = -1 }
+# False positives seem to rarely occur with this enabled, and the lints are appreciated.
+clippy.nursery = { level = 'warn', priority = -1 }
+
+# Helps avoid conflicting type names.
+clippy.module_name_repetitions = 'allow'
+# Adding unnecessary type annotations tends to make code less readable IMO.
+clippy.redundant_type_annotations = 'warn'
+
+# Prefer the usage of `#[expect]` attributes over `#[allow]`.
+clippy.allow_attributes = 'warn'
+# Enforce the usage of attribute reasons.
+clippy.allow_attributes_without_reason = 'deny'
+
+# Ensure all public items are documented.
+rust.missing_docs = 'warn'
+# Ensure all private items are also documented.
+clippy.missing_docs_in_private_items = 'warn'
+
+# Preferably avoid panics if at all possible.
+clippy.expect_used = 'warn'
+# Explicitly panicking is slightly more okay, but still should be avoided.
+clippy.panic = 'warn'
+# These should not be present unless the implementation is being worked on.
+clippy.todo = 'warn'
+# Unwrap should not be used at all.
+clippy.unwrap_used = 'deny'
+
+# Disallow the usage of unsafe.
+rust.unsafe_code = 'deny'
+# Unsafe blocks *must* have safety comments, no exceptions.
+clippy.undocumented_unsafe_blocks = 'deny'
+
+[dependencies]

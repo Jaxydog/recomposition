@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+#
+# Copyright © 2025 Jaxydog
+#
+# This file is part of Recomposition.
+#
+# Recomposition is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# Recomposition is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along with Recomposition. If not, see
+# <https://www.gnu.org/licenses/>.
+
+comment_width = 120
+condense_wildcard_suffixes = true
+edition = '2024'
+format_code_in_doc_comments = true
+format_macro_bodies = true
+format_macro_matchers = true
+format_strings = true
+group_imports = 'StdExternalCrate'
+hex_literal_case = 'Upper'
+imports_granularity = 'Module'
+imports_indent = 'Block'
+max_width = 120
+merge_derives = false
+newline_style = 'Unix'
+normalize_comments = true
+normalize_doc_attributes = true
+overflow_delimited_expr = true
+remove_nested_parens = true
+reorder_impl_items = true
+reorder_imports = true
+reorder_modules = true
+spaces_around_ranges = true
+struct_lit_single_line = true
+tab_spaces = 4
+trailing_comma = 'Vertical'
+trailing_semicolon = true
+type_punctuation_density = 'Wide'
+unstable_features = true
+use_field_init_shorthand = true
+use_small_heuristics = 'Max'
+use_try_shorthand = true
+style_edition = '2024'
+wrap_comments = true
