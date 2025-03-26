@@ -17,6 +17,8 @@
 
 //! Implements composable filters.
 
+use core::marker::PhantomData;
+
 /// A value that acts as a filter for a given type.
 pub trait Filter<T: ?Sized>: Sized {
     /// Returns `true` if the given value passes this [`Filter`] implementation.
@@ -26,35 +28,35 @@ pub trait Filter<T: ?Sized>: Sized {
 
     /// Returns a new [`Filter`] implementation that inverts the result of this implementation.
     #[inline]
-    fn not(self) -> Not<Self> {
-        Not { filter: self }
+    fn not(self) -> Not<T, Self> {
+        Not { filter: self, marker: PhantomData }
     }
 
     /// Returns a new [`Filter`] implementation that combines the results of both implementations using a logical AND.
     #[inline]
-    fn and<F>(self, other: F) -> And<Self, F>
+    fn and<F>(self, other: F) -> And<T, Self, F>
     where
         F: Filter<T>,
     {
-        And { filter_a: self, filter_b: other }
+        And { filter_a: self, filter_b: other, marker: PhantomData }
     }
 
     /// Returns a new [`Filter`] implementation that combines the results of both implementations using a logical OR.
     #[inline]
-    fn or<F>(self, other: F) -> Or<Self, F>
+    fn or<F>(self, other: F) -> Or<T, Self, F>
     where
         F: Filter<T>,
     {
-        Or { filter_a: self, filter_b: other }
+        Or { filter_a: self, filter_b: other, marker: PhantomData }
     }
 
     /// Returns a new [`Filter`] implementation that combines the results of both implementations using a logical XOR.
     #[inline]
-    fn xor<F>(self, other: F) -> Xor<Self, F>
+    fn xor<F>(self, other: F) -> Xor<T, Self, F>
     where
         F: Filter<T>,
     {
-        Xor { filter_a: self, filter_b: other }
+        Xor { filter_a: self, filter_b: other, marker: PhantomData }
     }
 }
 
@@ -94,9 +96,11 @@ where
 
 /// A [`Filter`] implementation that always returns `true`.
 #[derive(Clone, Debug)]
-pub struct Always;
+pub struct Always<T>(PhantomData<fn(&T)>)
+where
+    T: ?Sized;
 
-impl<T> Filter<T> for Always
+impl<T> Filter<T> for Always<T>
 where
     T: ?Sized,
 {
@@ -108,9 +112,11 @@ where
 
 /// A [`Filter`] implementation that always returns `false`.
 #[derive(Clone, Debug)]
-pub struct Never;
+pub struct Never<T>(PhantomData<fn(&T)>)
+where
+    T: ?Sized;
 
-impl<T> Filter<T> for Never
+impl<T> Filter<T> for Never<T>
 where
     T: ?Sized,
 {
@@ -122,12 +128,17 @@ where
 
 /// Inverts the stored [`Filter`] implementation.
 #[derive(Clone, Debug)]
-pub struct Not<F> {
+pub struct Not<T, F>
+where
+    T: ?Sized,
+{
     /// The inner filter.
     filter: F,
+    /// Retains the type being sorted.
+    marker: PhantomData<fn(&T)>,
 }
 
-impl<T, F> Filter<T> for Not<F>
+impl<T, F> Filter<T> for Not<T, F>
 where
     T: ?Sized,
     F: Filter<T>,
@@ -140,14 +151,19 @@ where
 
 /// Combines two filters using a logical AND.
 #[derive(Clone, Debug)]
-pub struct And<A, B> {
+pub struct And<T, A, B>
+where
+    T: ?Sized,
+{
     /// The first inner filter.
     filter_a: A,
     /// The second inner filter.
     filter_b: B,
+    /// Retains the type being sorted.
+    marker: PhantomData<fn(&T)>,
 }
 
-impl<T, A, B> Filter<T> for And<A, B>
+impl<T, A, B> Filter<T> for And<T, A, B>
 where
     T: ?Sized,
     A: Filter<T>,
@@ -161,14 +177,19 @@ where
 
 /// Combines two filters using a logical OR.
 #[derive(Clone, Debug)]
-pub struct Or<A, B> {
+pub struct Or<T, A, B>
+where
+    T: ?Sized,
+{
     /// The first inner filter.
     filter_a: A,
     /// The second inner filter.
     filter_b: B,
+    /// Retains the type being sorted.
+    marker: PhantomData<fn(&T)>,
 }
 
-impl<T, A, B> Filter<T> for Or<A, B>
+impl<T, A, B> Filter<T> for Or<T, A, B>
 where
     T: ?Sized,
     A: Filter<T>,
@@ -182,14 +203,19 @@ where
 
 /// Combines two filters using a logical XOR.
 #[derive(Clone, Debug)]
-pub struct Xor<A, B> {
+pub struct Xor<T, A, B>
+where
+    T: ?Sized,
+{
     /// The first inner filter.
     filter_a: A,
     /// The second inner filter.
     filter_b: B,
+    /// Retains the type being sorted.
+    marker: PhantomData<fn(&T)>,
 }
 
-impl<T, A, B> Filter<T> for Xor<A, B>
+impl<T, A, B> Filter<T> for Xor<T, A, B>
 where
     T: ?Sized,
     A: Filter<T>,
@@ -203,12 +229,17 @@ where
 
 /// Uses the given function as a [`Filter`] implementation.
 #[derive(Clone, Debug)]
-pub struct FromFn<F> {
+pub struct FromFn<T, F>
+where
+    T: ?Sized,
+{
     /// The predicate function.
     function: F,
+    /// Retains the type being sorted.
+    marker: PhantomData<fn(&T)>,
 }
 
-impl<T, F> Filter<T> for FromFn<F>
+impl<T, F> Filter<T> for FromFn<T, F>
 where
     T: ?Sized,
     F: Fn(&T) -> bool,
@@ -223,12 +254,12 @@ where
 ///
 /// The given function's output should ideally be deterministic.
 #[inline]
-pub const fn from_fn<T, F>(f: F) -> FromFn<F>
+pub const fn from_fn<T, F>(f: F) -> FromFn<T, F>
 where
     T: ?Sized,
     F: Fn(&T) -> bool,
 {
-    FromFn { function: f }
+    FromFn { function: f, marker: PhantomData }
 }
 
 /// Extends a type so that it may be filtered.
