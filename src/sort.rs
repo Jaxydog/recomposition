@@ -260,11 +260,11 @@ where
 /// Returns a [`Sort`] implementation that sorts values based on their [`PartialOrd`] implementation.
 #[inline]
 #[must_use]
-pub const fn partial_order<T>() -> Order<T>
+pub const fn partial_order<T>() -> PartialOrder<T>
 where
     T: ?Sized + Ord,
 {
-    Order(PhantomData)
+    PartialOrder(PhantomData)
 }
 
 /// Returns a [`Sort`] implementation that sorts values based on their [`Ord`] implementation.
