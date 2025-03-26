@@ -95,6 +95,22 @@ where
     }
 }
 
+/// Sorts values based on their [`PartialOrd`] implementation.
+#[derive(Clone, Debug)]
+pub struct PartialOrder<T>(PhantomData<fn(&T)>)
+where
+    T: ?Sized;
+
+impl<T> Sort<T> for PartialOrder<T>
+where
+    T: ?Sized + PartialOrd,
+{
+    #[inline]
+    fn compare(&self, lhs: &T, rhs: &T) -> Ordering {
+        lhs.partial_cmp(rhs).unwrap_or(Ordering::Equal)
+    }
+}
+
 /// Sorts values based on their [`Ord`] implementation.
 #[derive(Clone, Debug)]
 pub struct Order<T>(PhantomData<fn(&T)>)
@@ -239,6 +255,16 @@ where
     fn compare(&self, lhs: &T, rhs: &T) -> Ordering {
         (self.function)(lhs, rhs)
     }
+}
+
+/// Returns a [`Sort`] implementation that sorts values based on their [`PartialOrd`] implementation.
+#[inline]
+#[must_use]
+pub const fn partial_order<T>() -> Order<T>
+where
+    T: ?Sized + Ord,
+{
+    Order(PhantomData)
 }
 
 /// Returns a [`Sort`] implementation that sorts values based on their [`Ord`] implementation.
