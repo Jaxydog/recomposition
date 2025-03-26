@@ -250,6 +250,26 @@ where
     }
 }
 
+/// Returns a [`Filter`] implementation that always returns `true`.
+#[inline]
+#[must_use]
+pub const fn always<T>() -> Always<T>
+where
+    T: ?Sized,
+{
+    Always(PhantomData)
+}
+
+/// Returns a [`Filter`] implementation that always returns `true`.
+#[inline]
+#[must_use]
+pub const fn never<T>() -> Never<T>
+where
+    T: ?Sized,
+{
+    Never(PhantomData)
+}
+
 /// Creates a [`Filter`] implementation using the given function.
 ///
 /// The given function's output should ideally be deterministic.

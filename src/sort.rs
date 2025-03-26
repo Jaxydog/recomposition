@@ -241,6 +241,16 @@ where
     }
 }
 
+/// Returns a [`Sort`] implementation that sorts values based on their [`Ord`] implementation.
+#[inline]
+#[must_use]
+pub const fn order<T>() -> Order<T>
+where
+    T: ?Sized + Ord,
+{
+    Order(PhantomData)
+}
+
 /// Creates a [`Sort`] implementation using the given function.
 ///
 /// The output of this function must be deterministic to allow for proper collection sorting.
