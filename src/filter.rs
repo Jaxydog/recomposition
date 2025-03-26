@@ -58,6 +58,40 @@ pub trait Filter<T: ?Sized>: Sized {
     }
 }
 
+impl<T, F> Filter<T> for &F
+where
+    T: ?Sized,
+    F: Filter<T>,
+{
+    #[inline]
+    fn test(&self, value: &T) -> bool {
+        <F as Filter<T>>::test(self, value)
+    }
+}
+
+impl<T, F> Filter<T> for &mut F
+where
+    T: ?Sized,
+    F: Filter<T>,
+{
+    #[inline]
+    fn test(&self, value: &T) -> bool {
+        <F as Filter<T>>::test(self, value)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<T, F> Filter<T> for Box<F>
+where
+    T: ?Sized,
+    F: Filter<T>,
+{
+    #[inline]
+    fn test(&self, value: &T) -> bool {
+        <F as Filter<T>>::test(self, value)
+    }
+}
+
 /// A [`Filter`] implementation that always returns `true`.
 #[derive(Clone, Debug)]
 pub struct Always;

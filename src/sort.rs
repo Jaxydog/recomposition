@@ -61,6 +61,40 @@ pub trait Sort<T: ?Sized>: Sized {
     }
 }
 
+impl<T, S> Sort<T> for &S
+where
+    T: ?Sized,
+    S: Sort<T>,
+{
+    #[inline]
+    fn compare(&self, lhs: &T, rhs: &T) -> Ordering {
+        <S as Sort<T>>::compare(self, lhs, rhs)
+    }
+}
+
+impl<T, S> Sort<T> for &mut S
+where
+    T: ?Sized,
+    S: Sort<T>,
+{
+    #[inline]
+    fn compare(&self, lhs: &T, rhs: &T) -> Ordering {
+        <S as Sort<T>>::compare(self, lhs, rhs)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<T, S> Sort<T> for Box<S>
+where
+    T: ?Sized,
+    S: Sort<T>,
+{
+    #[inline]
+    fn compare(&self, lhs: &T, rhs: &T) -> Ordering {
+        <S as Sort<T>>::compare(self, lhs, rhs)
+    }
+}
+
 /// Sorts values based on their [`Ord`] implementation.
 #[derive(Clone, Debug)]
 pub struct Order;
